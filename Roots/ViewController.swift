@@ -17,6 +17,11 @@ struct Item {
 struct PlantData {
     var time: TimeInterval
     var value: Double
+    var type: Type
+}
+
+enum Type {
+    case light, humidity, moisture, temp
 }
 
 class ViewController: UIViewController {
@@ -26,7 +31,7 @@ class ViewController: UIViewController {
     
     var item = [Item(title: "Status", isSelected: true), Item(title: "Profile", isSelected: false)]
     
-    var plantData = [[PlantData](), [PlantData](), [PlantData]()]
+    var plantData = [[PlantData](), [PlantData](), [PlantData](), [PlantData]()]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,10 +47,12 @@ class ViewController: UIViewController {
                 var x = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? NSDictionary {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*60), value: v["temp"] as? Double ?? 31.3))
+                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v["temp"] as? Double ?? 31.3, type: .temp))
                     }
                 }
                 self.plantData[0] = x
+                print("Temp: ", x.count)
+                self.steupChild()
             }
         }
         
@@ -54,11 +61,12 @@ class ViewController: UIViewController {
                 var x = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? NSDictionary {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*60), value: v["humidity"] as? Double ?? 31.3))
+                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v["humidity"] as? Double ?? 31.3, type: .humidity))
                     }
                 }
                 self.plantData[1] = x
-                print(x)
+                print("Hum: ", x.count)
+                self.steupChild()
             }
         }
 
@@ -68,10 +76,59 @@ class ViewController: UIViewController {
                 var x = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? Double {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*60), value: v))
+                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v, type: .light))
                     }
                 }
+                print("Light: ", x.count)
                 self.plantData[2] = x
+                self.steupChild()
+            }
+        }
+        
+        Database.database().reference().child("sensor").child("soil").observe(.value) { (snapshot) in
+            if let data = snapshot.children.allObjects as? [DataSnapshot] {
+                var x = [PlantData]()
+                for i in data.enumerated() {
+                    if let v = i.element.value as? Double {
+                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v, type: .moisture))
+                    }
+                }
+                print("Soil: ", x.count)
+                self.plantData[3] = x
+                self.steupChild()
+            }
+        }
+        
+        Database.database().reference().child("optimum").observe(.value) { (snapshot) in
+            if let data = snapshot.children.allObjects as? [DataSnapshot] {
+                for i in data.enumerated() {
+                    if let v = i.element.value as? Double {
+                        if i.element.key == "humidity" {
+                            optimumHumidity = v
+                        } else if i.element.key == "light" {
+                            optimumLight = v
+                        } else if i.element.key == "temp" {
+                            optimumTemp = v
+                        }
+                    }
+                }
+                self.steupChild()
+            }
+        }
+
+    }
+    
+    func steupChild() {
+        if let p = childViewControllers.first as? PageViewController {
+            for i in p.childViewControllers {
+                if let vc = i as? ReadingsViewController {
+                    vc.plantData = plantData
+                    vc.tableView.reloadData()
+                }
+                if let vc = i as? StatViewController {
+                    vc.plantsData = plantData
+                }
+
             }
         }
     }
@@ -102,12 +159,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         collectionView.reloadItems(at: [index, indexPath])
         if let p = childViewControllers.first as? PageViewController {
             p.goToPage(id: item[indexPath.item].title, direction: indexPath.item == 0 ? .reverse : .forward)
-            for i in p.childViewControllers {
-                if let vc = i as? ReadingsViewController {
-                    vc.plantData = plantData
-                    vc.tableView.reloadData()
-                }
-            }
+            steupChild()
         }
     }
 

@@ -13,6 +13,8 @@
 		07E91D30207A0FF90080F1D4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07E91D2E207A0FF90080F1D4 /* Main.storyboard */; };
 		07E91D32207A0FF90080F1D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07E91D31207A0FF90080F1D4 /* Assets.xcassets */; };
 		07E91D35207A0FF90080F1D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07E91D33207A0FF90080F1D4 /* LaunchScreen.storyboard */; };
+		07E9FD39207B4FA3001B03D8 /* ARViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E9FD38207B4FA3001B03D8 /* ARViewController.swift */; };
+		07E9FD3B207B4FF2001B03D8 /* Bush1.dae in Resources */ = {isa = PBXBuildFile; fileRef = 07E9FD3A207B4FF1001B03D8 /* Bush1.dae */; };
 		07F28E71207A2981007A1EAD /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F28E70207A2981007A1EAD /* PageViewController.swift */; };
 		07F28E73207A43EE007A1EAD /* ReadingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F28E72207A43EE007A1EAD /* ReadingsViewController.swift */; };
 		07F28E75207A546B007A1EAD /* ReadingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F28E74207A546B007A1EAD /* ReadingsTableViewCell.swift */; };
@@ -30,6 +32,8 @@
 		07E91D31207A0FF90080F1D4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		07E91D34207A0FF90080F1D4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		07E91D36207A0FF90080F1D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		07E9FD38207B4FA3001B03D8 /* ARViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewController.swift; sourceTree = "<group>"; };
+		07E9FD3A207B4FF1001B03D8 /* Bush1.dae */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml.dae; path = Bush1.dae; sourceTree = "<group>"; };
 		07F28E70207A2981007A1EAD /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
 		07F28E72207A43EE007A1EAD /* ReadingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingsViewController.swift; sourceTree = "<group>"; };
 		07F28E74207A546B007A1EAD /* ReadingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingsTableViewCell.swift; sourceTree = "<group>"; };
@@ -74,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				07F28E78207A6DE6007A1EAD /* GoogleService-Info.plist */,
+				07E9FD3A207B4FF1001B03D8 /* Bush1.dae */,
 				07E91D2A207A0FF90080F1D4 /* AppDelegate.swift */,
 				074488F6207A239800D84222 /* ButtonCollectionViewCell.swift */,
 				07E91D2C207A0FF90080F1D4 /* ViewController.swift */,
@@ -85,6 +90,7 @@
 				07E91D33207A0FF90080F1D4 /* LaunchScreen.storyboard */,
 				07E91D36207A0FF90080F1D4 /* Info.plist */,
 				07F28E76207A6978007A1EAD /* StatViewController.swift */,
+				07E9FD38207B4FA3001B03D8 /* ARViewController.swift */,
 			);
 			path = Roots;
 			sourceTree = "<group>";
@@ -172,6 +178,7 @@
 				07F28E79207A6DE7007A1EAD /* GoogleService-Info.plist in Resources */,
 				07E91D32207A0FF90080F1D4 /* Assets.xcassets in Resources */,
 				07E91D30207A0FF90080F1D4 /* Main.storyboard in Resources */,
+				07E9FD3B207B4FF2001B03D8 /* Bush1.dae in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +252,7 @@
 				07E91D2D207A0FF90080F1D4 /* ViewController.swift in Sources */,
 				074488F7207A239800D84222 /* ButtonCollectionViewCell.swift in Sources */,
 				07F28E77207A6978007A1EAD /* StatViewController.swift in Sources */,
+				07E9FD39207B4FA3001B03D8 /* ARViewController.swift in Sources */,
 				07F28E75207A546B007A1EAD /* ReadingsTableViewCell.swift in Sources */,
 				07E91D2B207A0FF90080F1D4 /* AppDelegate.swift in Sources */,
 				07F28E71207A2981007A1EAD /* PageViewController.swift in Sources */,
