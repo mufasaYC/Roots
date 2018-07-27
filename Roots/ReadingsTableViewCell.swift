@@ -37,7 +37,7 @@ class ReadingsTableViewCell: UITableViewCell {
         }
         
         valueLabel.text = String(describing: floor(data.value*100)/100)
-        let x = Int(floor(Double(Date().timeIntervalSince1970 - data.time)/6000))
+        let x = data.time
         timeLabel.text = x < 1 ? "Just\nUpdated" : (x == 1 ? "Before\n\(x) hour" : "Before\n\(x) hours")
     }
     

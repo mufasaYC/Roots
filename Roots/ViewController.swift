@@ -15,7 +15,7 @@ struct Item {
 }
 
 struct PlantData {
-    var time: TimeInterval
+    var time: Int
     var value: Double
     var type: Type
 }
@@ -23,6 +23,8 @@ struct PlantData {
 enum Type {
     case light, humidity, moisture, temp
 }
+
+var plant = "Corn"
 
 class ViewController: UIViewController {
     
@@ -45,43 +47,40 @@ class ViewController: UIViewController {
         Database.database().reference().child("sensor").child("dht").observe(.value) { (snapshot) in
             if let data = snapshot.children.allObjects as? [DataSnapshot] {
                 var x = [PlantData]()
+                var x1 = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? NSDictionary {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v["temp"] as? Double ?? 31.3, type: .temp))
+                        let t = TimeInterval(i.element.key) ?? TimeInterval(0)/1000.0
+                        let y = Int(floor(Double(Date().timeIntervalSince1970 - t/1000.0)/6000))
+                        x.append(PlantData(time: y, value: v["temp"] as? Double ?? 31.3, type: .temp))
+                        x1.append(PlantData(time: y, value: v["humidity"] as? Double ?? 31.3, type: .humidity))
                     }
                 }
-                self.plantData[0] = x
+//                self.plantData[0] = x
+//                self.plantData[1] = x1
+                print(x1, "\n\n\n")
+                self.averageHum(data: x1)
+                self.averageTemp(data: x)
                 print("Temp: ", x.count)
-                self.steupChild()
+                print("Hum: ", x1.count)
+//                self.steupChild()
             }
         }
-        
-        Database.database().reference().child("sensor").child("dht").observe(.value) { (snapshot) in
-            if let data = snapshot.children.allObjects as? [DataSnapshot] {
-                var x = [PlantData]()
-                for i in data.enumerated() {
-                    if let v = i.element.value as? NSDictionary {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v["humidity"] as? Double ?? 31.3, type: .humidity))
-                    }
-                }
-                self.plantData[1] = x
-                print("Hum: ", x.count)
-                self.steupChild()
-            }
-        }
-
         
         Database.database().reference().child("sensor").child("light").observe(.value) { (snapshot) in
             if let data = snapshot.children.allObjects as? [DataSnapshot] {
                 var x = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? Double {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v, type: .light))
+                        let t = TimeInterval(i.element.key) ?? TimeInterval(0)/1000.0
+                        let y = Int(floor(Double(Date().timeIntervalSince1970 - t/1000.0)/6000))
+                        x.append(PlantData(time: y, value: v, type: .light))
                     }
                 }
                 print("Light: ", x.count)
-                self.plantData[2] = x
-                self.steupChild()
+                self.averageLight(data: x)
+//                self.plantData[2] = x
+//                self.steupChild()
             }
         }
         
@@ -90,7 +89,9 @@ class ViewController: UIViewController {
                 var x = [PlantData]()
                 for i in data.enumerated() {
                     if let v = i.element.value as? Double {
-                        x.append(PlantData(time: TimeInterval(i.element.key) ?? (Date().timeIntervalSince1970 - TimeInterval(i.offset)*6000), value: v, type: .moisture))
+                        let t = TimeInterval(i.element.key) ?? TimeInterval(0)/1000.0
+                        let y = Int(floor(Double(Date().timeIntervalSince1970 - t/1000.0)/6000))
+                        x.append(PlantData(time: y, value: v, type: .moisture))
                     }
                 }
                 print("Soil: ", x.count)
@@ -99,7 +100,11 @@ class ViewController: UIViewController {
             }
         }
         
-        Database.database().reference().child("optimum").observe(.value) { (snapshot) in
+        if let x = UserDefaults.standard.string(forKey: "plant") {
+            plant = x
+        }
+        
+        Database.database().reference().child("plants").child(plant).observe(.value) { (snapshot) in
             if let data = snapshot.children.allObjects as? [DataSnapshot] {
                 for i in data.enumerated() {
                     if let v = i.element.value as? Double {
@@ -115,8 +120,103 @@ class ViewController: UIViewController {
                 self.steupChild()
             }
         }
+    }
+    @IBAction func barButton(_ sender: Any) {
+        UserDefaults.standard.removeObject(forKey: "plant")
+        UserDefaults.standard.synchronize()
+        performSegue(withIdentifier: "c", sender: self)
+    }
+    
+    func averageHum(data: [PlantData]) {
+        
+        var x = 0
+        let d = data.sorted { (x, y) -> Bool in
+            return x.time < y.time
+        }
+        x = d.first?.time ?? 0
+        var new = [PlantData]()
+        var sum = 0.0
+        var count = 0
+        for i in d.enumerated() {
+            if i.element.time == x {
+                sum = sum + i.element.value
+                count += 1
+                if i.offset == d.count - 1 {
+                    new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                }
+            } else {
+                new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                x = i.element.time
+                sum = 0.0
+                count = 0
+            }
+        }
+        
+        self.plantData[1] = new
+        steupChild()
 
     }
+
+    func averageTemp(data: [PlantData]) {
+        
+        var x = 0
+        let d = data.sorted { (x, y) -> Bool in
+            return x.time < y.time
+        }
+        x = d.first?.time ?? 0
+        var new = [PlantData]()
+        var sum = 0.0
+        var count = 0
+        for i in d.enumerated() {
+            if i.element.time == x {
+                sum = sum + i.element.value
+                count += 1
+                if i.offset == d.count - 1 {
+                    new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                }
+            } else {
+                new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                x = i.element.time
+                sum = 0.0
+                count = 0
+            }
+        }
+        
+        self.plantData[0] = new
+        steupChild()
+        
+    }
+
+    func averageLight(data: [PlantData]) {
+        
+        var x = 0
+        let d = data.sorted { (x, y) -> Bool in
+            return x.time < y.time
+        }
+        x = d.first?.time ?? 0
+        var new = [PlantData]()
+        var sum = 0.0
+        var count = 0
+        for i in d.enumerated() {
+            if i.element.time == x {
+                sum = sum + i.element.value
+                count += 1
+                if i.offset == d.count - 1 {
+                    new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                }
+            } else {
+                new.append(PlantData(time: x, value: sum/Double(count == 0 ? 1 : count), type: i.element.type))
+                x = i.element.time
+                sum = 0.0
+                count = 0
+            }
+        }
+        
+        self.plantData[2] = new
+        steupChild()
+        
+    }
+
     
     func steupChild() {
         if let p = childViewControllers.first as? PageViewController {

@@ -72,19 +72,20 @@ class StatViewController: UIViewController {
             self.view.layoutIfNeeded()
         })
         
-        let m = min(w, l, t, h)
+        let m = min(w, l, t)
         if x[2] > 0.9 {
             descLabel.text = "Thank you for taking good care of me"
             return
         }
         if m == w {
             descLabel.text = "I am feeling parched!"
+            if h < optimumHumidity {
+                descLabel.text = "I am feeling parched and it's humid!"
+            }
         } else if m == l {
              descLabel.text = "I need more sunlight!"
         } else if m == t {
             descLabel.text = "I am feeling very cold!"
-        } else if m == h {
-            descLabel.text = "It is not humid enough, water me!"
         }
         
         
